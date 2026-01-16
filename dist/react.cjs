@@ -20,7 +20,8 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/react/index.ts
 var react_exports = {};
 __export(react_exports, {
-  MinecraftAvatar: () => MinecraftAvatar
+  MinecraftAvatar: () => MinecraftAvatar,
+  MinecraftFullBody: () => MinecraftFullBody
 });
 module.exports = __toCommonJS(react_exports);
 
@@ -102,8 +103,86 @@ var MinecraftAvatarComponent = ({
   );
 };
 var MinecraftAvatar = (0, import_react.memo)(MinecraftAvatarComponent);
+
+// src/react/MinecraftFullBody.tsx
+var import_react2 = require("react");
+var import_jsx_runtime2 = require("react/jsx-runtime");
+var MinecraftFullBodyComponent = ({
+  uuid,
+  mcid,
+  width = 128,
+  height = 256,
+  pose = "standing",
+  angle = 25,
+  className = "",
+  priority = false,
+  apiEndpoint = "/api/fullbody"
+}) => {
+  const [imgError, setImgError] = (0, import_react2.useState)(false);
+  const [isLoading, setIsLoading] = (0, import_react2.useState)(true);
+  const imageUrl = `${apiEndpoint}?uuid=${uuid}&width=${width}&height=${height}&pose=${pose}&angle=${angle}`;
+  const fallbackUrl = `${apiEndpoint}?uuid=${STEVE_UUID}&width=${width}&height=${height}&pose=${pose}&angle=${angle}`;
+  (0, import_react2.useEffect)(() => {
+    setImgError(false);
+    setIsLoading(true);
+  }, [uuid, pose, angle, width, height]);
+  const handleLoad = (0, import_react2.useCallback)(() => {
+    setIsLoading(false);
+  }, []);
+  const handleError = (0, import_react2.useCallback)(() => {
+    setImgError(true);
+    setIsLoading(false);
+  }, []);
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+    "div",
+    {
+      className,
+      style: {
+        width,
+        height,
+        position: "relative"
+      },
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          "img",
+          {
+            src: imgError ? fallbackUrl : imageUrl,
+            alt: mcid ? `${mcid} \u306E\u30D5\u30EB\u30DC\u30C7\u30A3` : "Minecraft full body avatar",
+            width,
+            height,
+            style: {
+              imageRendering: "pixelated",
+              display: isLoading ? "none" : "block",
+              width,
+              height
+            },
+            onLoad: handleLoad,
+            onError: handleError,
+            loading: priority ? "eager" : "lazy",
+            decoding: "async"
+          }
+        ),
+        isLoading && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          "div",
+          {
+            style: {
+              width,
+              height,
+              backgroundColor: "#3c3c3c",
+              position: "absolute",
+              top: 0,
+              left: 0
+            }
+          }
+        )
+      ]
+    }
+  );
+};
+var MinecraftFullBody = (0, import_react2.memo)(MinecraftFullBodyComponent);
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  MinecraftAvatar
+  MinecraftAvatar,
+  MinecraftFullBody
 });
 //# sourceMappingURL=react.cjs.map

@@ -20,7 +20,8 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/vue/index.ts
 var vue_exports = {};
 __export(vue_exports, {
-  MinecraftAvatar: () => MinecraftAvatar_default
+  MinecraftAvatar: () => MinecraftAvatar_default,
+  MinecraftFullBody: () => MinecraftFullBody_default
 });
 module.exports = __toCommonJS(vue_exports);
 
@@ -118,8 +119,107 @@ var MinecraftAvatar_default = /* @__PURE__ */ (0, import_vue.defineComponent)({
     };
   }
 });
+
+// src/vue/MinecraftFullBody.vue
+var import_vue4 = require("vue");
+var import_vue5 = require("vue");
+var import_vue6 = require("vue");
+var _hoisted_12 = ["src", "alt", "width", "height", "loading"];
+var STEVE_UUID2 = "8667ba71b85a4004af54457a9734eed7";
+var MinecraftFullBody_default = /* @__PURE__ */ (0, import_vue4.defineComponent)({
+  props: {
+    uuid: { type: String, required: true },
+    mcid: { type: String, required: false },
+    width: { type: Number, required: false, default: 128 },
+    height: { type: Number, required: false, default: 256 },
+    pose: { type: null, required: false, default: "standing" },
+    angle: { type: Number, required: false, default: 25 },
+    className: { type: String, required: false, default: "" },
+    priority: { type: Boolean, required: false, default: false },
+    apiEndpoint: { type: String, required: false, default: "/api/fullbody" }
+  },
+  setup(__props) {
+    const props = __props;
+    const imgError = (0, import_vue6.ref)(false);
+    const isLoading = (0, import_vue6.ref)(true);
+    const imageUrl = (0, import_vue6.computed)(
+      () => `${props.apiEndpoint}?uuid=${props.uuid}&width=${props.width}&height=${props.height}&pose=${props.pose}&angle=${props.angle}`
+    );
+    const fallbackUrl = (0, import_vue6.computed)(
+      () => `${props.apiEndpoint}?uuid=${STEVE_UUID2}&width=${props.width}&height=${props.height}&pose=${props.pose}&angle=${props.angle}`
+    );
+    const altText = (0, import_vue6.computed)(
+      () => props.mcid ? `${props.mcid} \u306E\u30D5\u30EB\u30DC\u30C7\u30A3` : "Minecraft full body avatar"
+    );
+    (0, import_vue6.watch)(
+      () => [props.uuid, props.pose, props.angle, props.width, props.height],
+      () => {
+        imgError.value = false;
+        isLoading.value = true;
+      }
+    );
+    function handleLoad() {
+      isLoading.value = false;
+    }
+    function handleError() {
+      imgError.value = true;
+      isLoading.value = false;
+    }
+    return (_ctx, _cache) => {
+      return (0, import_vue5.openBlock)(), (0, import_vue5.createElementBlock)(
+        "div",
+        {
+          class: (0, import_vue5.normalizeClass)(__props.className),
+          style: (0, import_vue5.normalizeStyle)({
+            width: `${__props.width}px`,
+            height: `${__props.height}px`,
+            position: "relative"
+          })
+        },
+        [
+          (0, import_vue5.createElementVNode)("img", {
+            src: imgError.value ? fallbackUrl.value : imageUrl.value,
+            alt: altText.value,
+            width: __props.width,
+            height: __props.height,
+            style: (0, import_vue5.normalizeStyle)({
+              imageRendering: "pixelated",
+              display: isLoading.value ? "none" : "block",
+              width: `${__props.width}px`,
+              height: `${__props.height}px`
+            }),
+            loading: __props.priority ? "eager" : "lazy",
+            decoding: "async",
+            onLoad: handleLoad,
+            onError: handleError
+          }, null, 44, _hoisted_12),
+          isLoading.value ? ((0, import_vue5.openBlock)(), (0, import_vue5.createElementBlock)(
+            "div",
+            {
+              key: 0,
+              style: (0, import_vue5.normalizeStyle)({
+                width: `${__props.width}px`,
+                height: `${__props.height}px`,
+                backgroundColor: "#3c3c3c",
+                position: "absolute",
+                top: 0,
+                left: 0
+              })
+            },
+            null,
+            4
+            /* STYLE */
+          )) : (0, import_vue5.createCommentVNode)("v-if", true)
+        ],
+        6
+        /* CLASS, STYLE */
+      );
+    };
+  }
+});
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  MinecraftAvatar
+  MinecraftAvatar,
+  MinecraftFullBody
 });
 //# sourceMappingURL=vue.cjs.map

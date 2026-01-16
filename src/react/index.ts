@@ -1,3 +1,4 @@
 // React exports
 export { MinecraftAvatar } from './MinecraftAvatar';
-export type { MinecraftAvatarProps } from '../shared/types';
+export { MinecraftFullBody } from './MinecraftFullBody';
+export type { MinecraftAvatarProps, MinecraftFullBodyProps, PoseName } from '../shared/types';
