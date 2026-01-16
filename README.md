@@ -365,6 +365,74 @@ export async function GET(request: NextRequest) {
 }
 ```
 
+## Vercel Deployment
+
+This repository includes ready-to-use Vercel API routes. You can deploy it directly to Vercel to create your own avatar API service.
+
+### Deploy to Vercel
+
+1. Fork or clone this repository
+2. Connect your repository to Vercel
+3. Deploy
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/bafv4/mcavatar)
+
+### API Endpoints
+
+Once deployed, the following endpoints are available:
+
+#### Face Avatar
+
+```
+GET /api/avatar?uuid=<uuid>&size=<size>&overlay=<true|false>
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `uuid` | string | Steve | Player UUID |
+| `size` | number | 64 | Output size (8-512) |
+| `overlay` | boolean | true | Include hat layer |
+
+**Example:**
+```
+https://your-app.vercel.app/api/avatar?uuid=069a79f4-44e9-4726-a5be-fca90e38aaf5&size=128
+```
+
+#### 3D Full Body
+
+```
+GET /api/fullbody?uuid=<uuid>&width=<width>&height=<height>&scale=<scale>&pose=<pose>&angle=<angle>&elevation=<elevation>&zoom=<zoom>&overlay=<true|false>
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `uuid` | string | Steve | Player UUID |
+| `width` | number | 300 | Output width (50-1000) |
+| `height` | number | 400 | Output height (50-1000) |
+| `scale` | number | 1 | Pixel density (1-4) |
+| `pose` | string | standing | Pose name |
+| `angle` | number | 25 | Camera angle (degrees) |
+| `elevation` | number | 10 | Camera elevation (degrees) |
+| `zoom` | number | 1 | Zoom level |
+| `overlay` | boolean | true | Include overlay layers |
+
+**Available poses:** `standing`, `walking`, `running`, `waving`, `sitting`, `pointing`, `crossed_arms`
+
+**Example:**
+```
+https://your-app.vercel.app/api/fullbody?uuid=069a79f4-44e9-4726-a5be-fca90e38aaf5&pose=waving&angle=30
+```
+
+### Usage in HTML
+
+```html
+<!-- Face Avatar -->
+<img src="https://your-app.vercel.app/api/avatar?uuid=YOUR_UUID&size=64" alt="Avatar">
+
+<!-- Full Body -->
+<img src="https://your-app.vercel.app/api/fullbody?uuid=YOUR_UUID&pose=standing" alt="Full Body">
+```
+
 ## License
 
 MIT
