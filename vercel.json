@@ -1,5 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "",
+  "outputDirectory": "",
   "functions": {
     "api/avatar.ts": {
       "memory": 1024,
