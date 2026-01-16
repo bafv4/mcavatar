@@ -1,16 +1,15 @@
 # @bafv4/mcavatar
 
-Minecraft avatar generation library with 3D full-body support for Node.js, React, and Vue applications.
+Minecraft avatar generation library with 3D full-body support for React and Vue applications.
 
 ## Features
 
-- **Face Avatar**: Generate 2D face avatars from Minecraft skins
-- **3D Full Body**: Render 3D full-body avatars using skinview3d
+- **Face Avatar**: 2D face avatars (client-side Canvas or server-side Sharp)
+- **3D Full Body**: 3D full-body avatars using skinview3d (client-side) or API (server-side)
 - **Multiple Poses**: Standing, walking, running, waving, sitting, pointing, crossed arms
-- **Custom Poses**: Define your own pose configurations
-- **High-DPI Support**: Scale option for Retina displays
+- **Animations**: Built-in walking, running, and rotation animations (client-side)
 - **React/Vue Components**: Ready-to-use components for frontend frameworks
-- **Auto Skin Detection**: Automatically detects slim (Alex) vs classic (Steve) arm models
+- **Dual Rendering**: Both client-side and server-side rendering support
 
 ## Installation
 
@@ -37,78 +36,117 @@ Or specify in `package.json`:
 }
 ```
 
-To install a specific branch or tag:
-
-```bash
-# Specific branch
-pnpm add github:bafv4/mcavatar#main
-
-# Specific tag/release
-pnpm add github:bafv4/mcavatar#v1.1.0
-
-# Specific commit
-pnpm add github:bafv4/mcavatar#abc1234
-```
-
 ### Peer Dependencies
 
-Install required peer dependencies:
+Install based on your use case:
 
 ```bash
-# For face avatar only (generateAvatar)
-pnpm add sharp @napi-rs/canvas
+# For client-side rendering only (no additional deps needed for face avatar)
+# For 3D full body client-side
+pnpm add skinview3d three
 
-# For 3D full body (generateFullBody) - also requires puppeteer
-pnpm add sharp @napi-rs/canvas puppeteer
+# For server-side rendering (API routes)
+pnpm add sharp @napi-rs/canvas
 ```
 
-| Package | Required | Description |
-|---------|----------|-------------|
-| `sharp` | Yes | Image processing |
-| `@napi-rs/canvas` | Yes | Canvas rendering |
-| `puppeteer` | 3D only | Headless browser for 3D rendering |
-| `react` | Optional | For React components |
-| `vue` | Optional | For Vue components |
-
-> **Note**: If you only need face avatars (`generateAvatar`), you don't need to install `puppeteer`.
+| Package | Required For | Description |
+|---------|--------------|-------------|
+| `skinview3d` | 3D Full body (client) | WebGL-based Minecraft skin viewer |
+| `three` | 3D Full body (client) | 3D rendering engine |
+| `sharp` | Server-side API | Image processing |
+| `@napi-rs/canvas` | Server-side API | Canvas rendering |
 
 ## Usage
 
+### Rendering Modes
+
+All components support two rendering modes:
+
+1. **Client-side (default)**: Renders directly in the browser
+   - Face avatar: Uses Canvas API
+   - Full body: Uses skinview3d (WebGL)
+
+2. **Server-side**: Fetches from your API endpoint
+   - Add `apiEndpoint` prop to use server-side rendering
+
+## React Components
+
 ### Face Avatar
 
-```typescript
-import { generateAvatar } from '@bafv4/mcavatar';
+```tsx
+import { MinecraftAvatar } from '@bafv4/mcavatar/react';
 
-const result = await generateAvatar('player-uuid-here', {
-  size: 64,              // Output size in pixels (default: 64)
-  includeOverlay: true,  // Include hat/overlay layer (default: true)
-});
+// Client-side rendering (default)
+<MinecraftAvatar
+  uuid="player-uuid"
+  size={64}
+/>
 
-// result.data is a Buffer containing PNG image
+// Server-side rendering
+<MinecraftAvatar
+  uuid="player-uuid"
+  size={64}
+  apiEndpoint="/api/avatar"
+/>
 ```
+
+#### Face Avatar Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `uuid` | `string` | required | Player UUID |
+| `mcid` | `string` | - | Player name for alt text |
+| `size` | `number` | `64` | Output size in pixels |
+| `overlay` | `boolean` | `true` | Include hat/overlay layer |
+| `className` | `string` | - | CSS class name |
+| `apiEndpoint` | `string` | - | API endpoint for server-side rendering |
 
 ### 3D Full Body
 
-```typescript
-import { generateFullBody, closeBrowser } from '@bafv4/mcavatar';
+```tsx
+import { MinecraftFullBody } from '@bafv4/mcavatar/react';
 
-const result = await generateFullBody('player-uuid-here', {
-  width: 300,           // Output width (default: 300)
-  height: 400,          // Output height (default: 400)
-  scale: 2,             // Pixel density for Retina (default: 1)
-  pose: 'standing',     // Pose name (default: 'standing')
-  view: {
-    angle: 25,          // Camera angle in degrees (default: 0)
-    elevation: 10,      // Camera elevation (default: 0)
-    zoom: 1.0,          // Zoom level (default: 1.0)
-  },
-  includeOverlay: true, // Include overlay layers (default: true)
-  background: null,     // Background color or null for transparent
-});
+// Client-side rendering (default, requires skinview3d)
+<MinecraftFullBody
+  uuid="player-uuid"
+  width={300}
+  height={400}
+  pose="waving"
+  angle={30}
+/>
 
-// Important: Close browser when done to free resources
-await closeBrowser();
+// With animation (client-side only)
+<MinecraftFullBody
+  uuid="player-uuid"
+  walk={true}
+  rotate={true}
+/>
+
+// Server-side rendering
+<MinecraftFullBody
+  uuid="player-uuid"
+  apiEndpoint="/api/fullbody"
+/>
 ```
+
+#### Full Body Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `uuid` | `string` | required | Player UUID |
+| `mcid` | `string` | - | Player name for alt text |
+| `width` | `number` | `300` | Canvas width in pixels |
+| `height` | `number` | `400` | Canvas height in pixels |
+| `pose` | `PoseName` | `'standing'` | Pose name |
+| `angle` | `number` | `25` | Camera rotation angle (degrees) |
+| `elevation` | `number` | `10` | Camera elevation angle (degrees) |
+| `zoom` | `number` | `0.9` | Zoom level |
+| `className` | `string` | - | CSS class name |
+| `background` | `string` | transparent | Background color |
+| `walk` | `boolean` | `false` | Enable walking animation (client-side only) |
+| `run` | `boolean` | `false` | Enable running animation (client-side only) |
+| `rotate` | `boolean` | `false` | Enable auto-rotation (client-side only) |
+| `apiEndpoint` | `string` | - | API endpoint for server-side rendering |
 
 ### Available Poses
 
@@ -122,74 +160,9 @@ await closeBrowser();
 | `pointing` | Right arm extended forward |
 | `crossed_arms` | Arms crossed over chest |
 
-### Custom Poses
+## Vue Components
 
-```typescript
-import { generateFullBody, createCustomPose } from '@bafv4/mcavatar';
-
-const customPose = createCustomPose(
-  { rotation: { pitch: -10, yaw: 15, roll: 0 } },  // head
-  { rotation: { pitch: 0, yaw: 0, roll: 0 } },     // torso
-  { rotation: { pitch: 45, yaw: 0, roll: 5 } },    // leftArm
-  { rotation: { pitch: -30, yaw: 0, roll: -5 } },  // rightArm
-  { rotation: { pitch: 0, yaw: 0, roll: 0 } },     // leftLeg
-  { rotation: { pitch: 0, yaw: 0, roll: 0 } },     // rightLeg
-);
-
-const result = await generateFullBody('player-uuid', {
-  pose: customPose,
-});
-```
-
-### High-DPI / Retina Support
-
-```typescript
-// Normal resolution (300x400 pixels)
-const normal = await generateFullBody('uuid', {
-  width: 300,
-  height: 400,
-  scale: 1,
-});
-
-// Retina resolution (600x800 pixels at 2x density)
-const retina = await generateFullBody('uuid', {
-  width: 300,
-  height: 400,
-  scale: 2,
-});
-```
-
-## React Component
-
-```tsx
-import { MinecraftAvatar } from '@bafv4/mcavatar/react';
-
-// Face avatar
-<MinecraftAvatar
-  uuid="player-uuid"
-  mcid="PlayerName"
-  size={64}
-  className="avatar"
-  apiEndpoint="/api/avatar"
-/>
-```
-
-```tsx
-import { MinecraftFullBody } from '@bafv4/mcavatar/react';
-
-// Full body
-<MinecraftFullBody
-  uuid="player-uuid"
-  mcid="PlayerName"
-  width={300}
-  height={400}
-  pose="waving"
-  angle={25}
-  apiEndpoint="/api/fullbody"
-/>
-```
-
-## Vue Component
+### Face Avatar
 
 ```vue
 <script setup>
@@ -197,14 +170,15 @@ import { MinecraftAvatar } from '@bafv4/mcavatar/vue';
 </script>
 
 <template>
-  <MinecraftAvatar
-    uuid="player-uuid"
-    mcid="PlayerName"
-    :size="64"
-    api-endpoint="/api/avatar"
-  />
+  <!-- Client-side rendering -->
+  <MinecraftAvatar uuid="player-uuid" :size="64" />
+
+  <!-- Server-side rendering -->
+  <MinecraftAvatar uuid="player-uuid" api-endpoint="/api/avatar" />
 </template>
 ```
+
+### 3D Full Body
 
 ```vue
 <script setup>
@@ -212,23 +186,56 @@ import { MinecraftFullBody } from '@bafv4/mcavatar/vue';
 </script>
 
 <template>
+  <!-- Client-side rendering -->
   <MinecraftFullBody
     uuid="player-uuid"
-    mcid="PlayerName"
     :width="300"
     :height="400"
     pose="waving"
-    :angle="25"
+  />
+
+  <!-- Server-side rendering -->
+  <MinecraftFullBody
+    uuid="player-uuid"
     api-endpoint="/api/fullbody"
   />
 </template>
 ```
 
-## API Reference
+## Server-Side API (Optional)
+
+If you need server-side rendering, create API routes:
+
+### Face Avatar API
+
+```typescript
+// app/api/avatar/route.ts (Next.js)
+import { generateAvatar } from '@bafv4/mcavatar';
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function GET(request: NextRequest) {
+  const uuid = request.nextUrl.searchParams.get('uuid');
+  const size = parseInt(request.nextUrl.searchParams.get('size') || '64');
+  const overlay = request.nextUrl.searchParams.get('overlay') !== 'false';
+
+  if (!uuid) {
+    return NextResponse.json({ error: 'UUID required' }, { status: 400 });
+  }
+
+  const result = await generateAvatar(uuid, { size, includeOverlay: overlay });
+
+  return new NextResponse(result.data, {
+    headers: {
+      'Content-Type': 'image/png',
+      'Cache-Control': 'public, max-age=3600',
+    },
+  });
+}
+```
 
 ### `generateAvatar(uuid, options?)`
 
-Generate a 2D face avatar.
+Server-side function to generate face avatars.
 
 **Options:**
 | Option | Type | Default | Description |
@@ -239,51 +246,6 @@ Generate a 2D face avatar.
 
 **Returns:** `Promise<AvatarResult>`
 
-### `generateFullBody(uuid, options?)`
-
-Generate a 3D full-body avatar.
-
-**Options:**
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `width` | `number` | `300` | Output width in pixels |
-| `height` | `number` | `400` | Output height in pixels |
-| `scale` | `number` | `1` | Pixel density (2 for Retina) |
-| `pose` | `PoseName \| PoseDefinition` | `'standing'` | Pose to render |
-| `view.angle` | `number` | `0` | Camera rotation (degrees) |
-| `view.elevation` | `number` | `0` | Camera elevation (degrees) |
-| `view.zoom` | `number` | `1.0` | Zoom level |
-| `includeOverlay` | `boolean` | `true` | Include overlay layers |
-| `armModel` | `'classic' \| 'slim'` | auto | Arm model override |
-| `background` | `string \| null` | `null` | Background color |
-| `fallbackUuid` | `string` | Steve UUID | Fallback if skin fetch fails |
-
-**Returns:** `Promise<FullBodyResult>`
-
-### `closeBrowser()`
-
-Close the Puppeteer browser instance. Call this when your application shuts down to free resources.
-
-```typescript
-await closeBrowser();
-```
-
-### Pose Utilities
-
-```typescript
-import {
-  getPose,           // Get pose definition by name
-  validatePose,      // Validate custom pose
-  createCustomPose,  // Create custom pose from parts
-  interpolatePoses,  // Interpolate between poses (for animation)
-  POSES,             // All predefined poses
-} from '@bafv4/mcavatar';
-```
-
-## Result Types
-
-### AvatarResult
-
 ```typescript
 interface AvatarResult {
   data: Buffer;              // PNG image data
@@ -292,145 +254,6 @@ interface AvatarResult {
   skinFormat: 'legacy' | 'modern';
   hasOverlay: boolean;
 }
-```
-
-### FullBodyResult
-
-```typescript
-interface FullBodyResult {
-  data: Buffer;              // PNG image data
-  contentType: 'image/png';
-  usedFallback: boolean;
-  skinFormat: 'legacy' | 'modern';
-  armModel: 'classic' | 'slim';
-  pose: PoseName;
-  hasOverlay: boolean;
-}
-```
-
-## Server-Side Usage Example
-
-### Next.js API Route
-
-```typescript
-// app/api/avatar/route.ts
-import { generateAvatar } from '@bafv4/mcavatar';
-import { NextRequest, NextResponse } from 'next/server';
-
-export async function GET(request: NextRequest) {
-  const uuid = request.nextUrl.searchParams.get('uuid');
-
-  if (!uuid) {
-    return NextResponse.json({ error: 'UUID required' }, { status: 400 });
-  }
-
-  const result = await generateAvatar(uuid, { size: 64 });
-
-  return new NextResponse(result.data, {
-    headers: {
-      'Content-Type': 'image/png',
-      'Cache-Control': 'public, max-age=3600',
-    },
-  });
-}
-```
-
-```typescript
-// app/api/fullbody/route.ts
-import { generateFullBody } from '@bafv4/mcavatar';
-import { NextRequest, NextResponse } from 'next/server';
-
-export async function GET(request: NextRequest) {
-  const { searchParams } = request.nextUrl;
-  const uuid = searchParams.get('uuid');
-  const pose = searchParams.get('pose') || 'standing';
-
-  if (!uuid) {
-    return NextResponse.json({ error: 'UUID required' }, { status: 400 });
-  }
-
-  const result = await generateFullBody(uuid, {
-    width: 300,
-    height: 400,
-    pose: pose as any,
-    view: { angle: 25, elevation: 10 },
-  });
-
-  return new NextResponse(result.data, {
-    headers: {
-      'Content-Type': 'image/png',
-      'Cache-Control': 'public, max-age=3600',
-    },
-  });
-}
-```
-
-## Vercel Deployment
-
-This repository includes ready-to-use Vercel API routes. You can deploy it directly to Vercel to create your own avatar API service.
-
-### Deploy to Vercel
-
-1. Fork or clone this repository
-2. Connect your repository to Vercel
-3. Deploy
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/bafv4/mcavatar)
-
-### API Endpoints
-
-Once deployed, the following endpoints are available:
-
-#### Face Avatar
-
-```
-GET /api/avatar?uuid=<uuid>&size=<size>&overlay=<true|false>
-```
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `uuid` | string | Steve | Player UUID |
-| `size` | number | 64 | Output size (8-512) |
-| `overlay` | boolean | true | Include hat layer |
-
-**Example:**
-```
-https://your-app.vercel.app/api/avatar?uuid=069a79f4-44e9-4726-a5be-fca90e38aaf5&size=128
-```
-
-#### 3D Full Body
-
-```
-GET /api/fullbody?uuid=<uuid>&width=<width>&height=<height>&scale=<scale>&pose=<pose>&angle=<angle>&elevation=<elevation>&zoom=<zoom>&overlay=<true|false>
-```
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `uuid` | string | Steve | Player UUID |
-| `width` | number | 300 | Output width (50-1000) |
-| `height` | number | 400 | Output height (50-1000) |
-| `scale` | number | 1 | Pixel density (1-4) |
-| `pose` | string | standing | Pose name |
-| `angle` | number | 25 | Camera angle (degrees) |
-| `elevation` | number | 10 | Camera elevation (degrees) |
-| `zoom` | number | 1 | Zoom level |
-| `overlay` | boolean | true | Include overlay layers |
-
-**Available poses:** `standing`, `walking`, `running`, `waving`, `sitting`, `pointing`, `crossed_arms`
-
-**Example:**
-```
-https://your-app.vercel.app/api/fullbody?uuid=069a79f4-44e9-4726-a5be-fca90e38aaf5&pose=waving&angle=30
-```
-
-### Usage in HTML
-
-```html
-<!-- Face Avatar -->
-<img src="https://your-app.vercel.app/api/avatar?uuid=YOUR_UUID&size=64" alt="Avatar">
-
-<!-- Full Body -->
-<img src="https://your-app.vercel.app/api/fullbody?uuid=YOUR_UUID&pose=standing" alt="Full Body">
 ```
 
 ## License

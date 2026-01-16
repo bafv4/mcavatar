@@ -81,11 +81,11 @@ export interface MinecraftAvatarProps {
   mcid?: string;
   /** Output size in pixels (default: 64) */
   size?: number;
+  /** Include overlay/hat layer (default: true) */
+  overlay?: boolean;
   /** Additional CSS class */
   className?: string;
-  /** Priority loading (for above-the-fold content) */
-  priority?: boolean;
-  /** API endpoint for avatar generation (default: '/api/avatar') */
+  /** API endpoint for server-side rendering. If not specified, renders client-side. */
   apiEndpoint?: string;
 }
 
@@ -247,19 +247,29 @@ export interface MinecraftFullBodyProps {
   uuid: string;
   /** Player MCID for alt text */
   mcid?: string;
-  /** Output width in pixels (default: 128) */
+  /** Output width in pixels (default: 300) */
   width?: number;
-  /** Output height in pixels (default: 256) */
+  /** Output height in pixels (default: 400) */
   height?: number;
   /** Pose name (default: 'standing') */
   pose?: PoseName;
   /** View angle in degrees (default: 25) */
   angle?: number;
+  /** View elevation in degrees (default: 10) */
+  elevation?: number;
+  /** Zoom level (default: 0.9) */
+  zoom?: number;
   /** Additional CSS class */
   className?: string;
-  /** Priority loading */
-  priority?: boolean;
-  /** API endpoint (default: '/api/fullbody') */
+  /** Background color (default: transparent) */
+  background?: string;
+  /** Walk animation enabled (default: false) */
+  walk?: boolean;
+  /** Run animation enabled (default: false) */
+  run?: boolean;
+  /** Rotate animation enabled (default: false) */
+  rotate?: boolean;
+  /** API endpoint for server-side rendering. If not specified, renders client-side with skinview3d. */
   apiEndpoint?: string;
 }
 

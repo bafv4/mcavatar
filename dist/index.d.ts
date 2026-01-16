@@ -1,5 +1,15 @@
-import { A as AvatarOptions, F as FullBodyOptions, P as PoseName, a as PoseDefinition, B as BodyPartPose, b as AvatarResult, c as FullBodyResult } from './types-DVuTXly0.js';
-export { f as ArmModel, g as BodyPart, M as MinecraftAvatarProps, d as MinecraftFullBodyProps, R as Rotation3D, S as SkinFormat, V as Vector3, e as ViewConfig } from './types-DVuTXly0.js';
+import { A as AvatarOptions, F as FullBodyOptions, P as PoseName, a as PoseDefinition, B as BodyPartPose, b as AvatarResult, c as FullBodyResult } from './types-qoLitC4k.js';
+export { f as ArmModel, g as BodyPart, M as MinecraftAvatarProps, d as MinecraftFullBodyProps, R as Rotation3D, S as SkinFormat, V as Vector3, e as ViewConfig } from './types-qoLitC4k.js';
+
+/**
+ * 3D Full Body Renderer using skinview3d + Puppeteer
+ * Renders Minecraft character models with accurate proportions via headless browser
+ */
+
+/**
+ * Close the browser instance (call when shutting down)
+ */
+declare function closeBrowser(): Promise<void>;
 
 /**
  * Minecraft Avatar Constants
@@ -112,4 +122,4 @@ declare function generateAvatar(uuid: string, options?: AvatarOptions): Promise<
  */
 declare function generateFullBody(uuid: string, options?: FullBodyOptions): Promise<FullBodyResult>;
 
-export { AvatarOptions, AvatarResult, BodyPartPose, DEFAULT_FULLBODY_OPTIONS, DEFAULT_OPTIONS, FullBodyOptions, FullBodyResult, POSES, PoseDefinition, PoseName, STEVE_UUID, createCustomPose, formatUuid, generateAvatar, generateFullBody, getPose, validatePose, validateUuid };
+export { AvatarOptions, AvatarResult, BodyPartPose, DEFAULT_FULLBODY_OPTIONS, DEFAULT_OPTIONS, FullBodyOptions, FullBodyResult, POSES, PoseDefinition, PoseName, STEVE_UUID, closeBrowser, createCustomPose, formatUuid, generateAvatar, generateFullBody, getPose, validatePose, validateUuid };
