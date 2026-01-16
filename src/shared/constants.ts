@@ -280,6 +280,7 @@ export const DEFAULT_FULLBODY_OPTIONS: Required<
 > & { pose: 'standing' } = {
   width: 300,
   height: 400,
+  scale: 1,
   includeOverlay: true,
   pose: 'standing',
   view: DEFAULT_VIEW,
