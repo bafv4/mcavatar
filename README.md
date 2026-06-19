@@ -1,6 +1,6 @@
 # @bafv4/mcavatar
 
-Minecraft avatar generation library with 3D full-body support for React and Vue applications.
+Minecraft avatar generation library with 2D(Face) and 3D full-body support for Web applications. 
 
 ## Features
 
